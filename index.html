@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Blockchain Supply Chain Ledger</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f4f6f8;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+}
+
+.container{
+    width:600px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:8px;
+}
+
+input{
+    width:100%;
+    padding:8px;
+    margin:5px 0;
+}
+
+button{
+    padding:10px;
+    width:100%;
+    background:#2c7be5;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+.block{
+    background:#ffffff;
+    border:1px solid #ccc;
+    padding:15px;
+    margin-top:15px;
+    border-radius:6px;
+}
+
+.hash{
+    word-wrap:break-word;
+    font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Supply Chain Blockchain</h1>
+
+<input id="actor" placeholder="Actor (Farmer, Distributor etc)">
+<input id="activity" placeholder="Activity (Harvested, Transported)">
+<input id="product" placeholder="Product Name (Capsicum)">
+<input id="productID" placeholder="Product ID">
+
+<button onclick="addBlock()">Add Block</button>
+
+<div id="blockchain"></div>
+
+</div>
+
+<script>
+
+let blockchain = [];
+
+function simpleHash(data){
+    let hash = 0;
+    for(let i=0;i<data.length;i++){
+        hash = ((hash<<5)-hash) + data.charCodeAt(i);
+        hash = hash & hash;
+    }
+    return hash.toString();
+}
+
+function addBlock(){
+
+    let actor = document.getElementById("actor").value;
+    let activity = document.getElementById("activity").value;
+    let product = document.getElementById("product").value;
+    let productID = document.getElementById("productID").value;
+
+    let blockNumber = blockchain.length + 1;
+
+    let timestamp = new Date().toLocaleString();
+
+    let prevHash = blockchain.length === 0 ? "0" : blockchain[blockchain.length-1].hash;
+
+    let data = blockNumber + actor + activity + product + productID + timestamp + prevHash;
+
+    let currentHash = simpleHash(data);
+
+    let block = {
+        number:blockNumber,
+        actor:actor,
+        activity:activity,
+        product:product,
+        productID:productID,
+        timestamp:timestamp,
+        prevHash:prevHash,
+        hash:currentHash
+    };
+
+    blockchain.push(block);
+
+    displayBlock(block);
+
+}
+
+function displayBlock(block){
+
+    let div = document.createElement("div");
+    div.className = "block";
+
+    div.innerHTML =
+    "<b>Block Number:</b> " + block.number + "<br>" +
+    "<b>Actor:</b> " + block.actor + "<br>" +
+    "<b>Activity:</b> " + block.activity + "<br>" +
+    "<b>Product:</b> " + block.product + "<br>" +
+    "<b>Product ID:</b> " + block.productID + "<br>" +
+    "<b>Timestamp:</b> " + block.timestamp + "<br>" +
+    "<b>Previous Hash:</b> <span class='hash'>" + block.prevHash + "</span><br>" +
+    "<b>Current Hash:</b> <span class='hash'>" + block.hash + "</span>";
+
+    document.getElementById("blockchain").appendChild(div);
+
+}
+
+</script>
+
+</body>
+</html>
